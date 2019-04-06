@@ -105,9 +105,9 @@ def calc_accuracy(page):
         dist_p31 = kldiv(kldiv_vecs[2], kldiv_vecs[0])
         if (dist_p12 < dist_p23 and dist_p12 < dist_p31):
             acc += 1
-        print("Similar paras: ("+t[0]+","+t[1]+"), Odd: "+t[2])
-        print("1,2: "+str(kldiv(kldiv_vecs[0],kldiv_vecs[1]))+", 2,3: "+str(kldiv(kldiv_vecs[1],kldiv_vecs[2]))+
-              ", 3,1: "+str(kldiv(kldiv_vecs[2],kldiv_vecs[0])))
+        # print("Similar paras: ("+t[0]+","+t[1]+"), Odd: "+t[2])
+        # print("1,2: "+str(kldiv(kldiv_vecs[0],kldiv_vecs[1]))+", 2,3: "+str(kldiv(kldiv_vecs[1],kldiv_vecs[2]))+
+        #       ", 3,1: "+str(kldiv(kldiv_vecs[2],kldiv_vecs[0])))
     accuracy = acc * 100 / len(triples_data[()][page])
     print(page + " Accuracy: " + accuracy + "%")
 
