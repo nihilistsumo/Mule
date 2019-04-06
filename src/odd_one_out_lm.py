@@ -86,7 +86,7 @@ def calc_para_lmjm(page):
     return  para_lmjm, para_term_freq_vecs, c_term_freq
 
 def calc_accuracy(page):
-    if(len(triples_data[()][page])<1000):
+    if(len(triples_data[()][page])<max_num_triples_in_page):
         print(page+" started "+str(len(triples_data[()][page]))+" triples")
         para_lmjm, para_term_freq_vecs, c_term_freq = calc_para_lmjm(page)
         acc = 0.0
@@ -153,7 +153,7 @@ page_topics_file = sys.argv[5]
 para_freq_file = sys.argv[6]
 para_ind_file = sys.argv[7]
 triples_file = sys.argv[8]
-num_workers = int(sys.argv[9])
+max_num_triples_in_page = int(sys.argv[9])
 
 page_freq_vec, terms, page_para_labels, page_paras, page_tops, para_inds, para_freqs = \
     get_page_term_freq_vecs(page_paras_file, page_topics_file, labels_file, terms_file, para_ind_file, para_freq_file)
