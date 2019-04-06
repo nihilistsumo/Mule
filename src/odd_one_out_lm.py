@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import json, sys, math
+import json, sys, math, time
 import numpy as np
 from scipy import special
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
@@ -64,52 +64,76 @@ def kldiv(p,q):
             score += p[x] * math.log(p[x]/q[x])
     return score
 
-def calc_accuracy(page):
-    print(page+" started")
+correct = []
+incorrect = []
+def calc_para_lmjm(page):
     cum_page_freq = np.zeros(len(terms))
     for k in page_freq_vec[page].keys():
         cum_page_freq += page_freq_vec[page][k]
     c_term_freq = np.array(global_term_freq - cum_page_freq)
-    acc = 0.0
-    for t in triples_data[()][page]:
-        top_freq_vec_page = page_freq_vec[page]
-        p_term_vecs = []
-        for p in t:
-            plabel = page_para_labels[page][p]
-            pind = para_inds[p]
-            pfreq = para_freqs[p]
-            p_term_vec = np.zeros(len(terms))
-            for i in range(len(pind)):
-                p_term_vec[pind[i]] = pfreq[i]
-            p_term_vecs.append(p_term_vec)
-            top_freq_vec_page[plabel] -= p_term_vec
 
-        lm_in_page = []
-        for l in top_freq_vec_page.keys():
-            lm_in_page.append(jm_smoothing(top_freq_vec_page[l], c_term_freq))
-        lm_in_page = np.array(lm_in_page)
-        for i in range(3):
-            p_term_vecs[i] = jm_smoothing(p_term_vecs[i], c_term_freq)
+    paras = page_paras[page]
+    para_lmjm = dict()
+    para_term_freq_vecs = dict()
+    for p in paras:
+        pind = para_inds[p]
+        pfreq = para_freqs[p]
+        p_term_vec = np.zeros(len(terms))
+        for i in range(len(pind)):
+            p_term_vec[pind[i]] = pfreq[i]
+        para_term_freq_vecs[p] = p_term_vec
+        para_lmjm[p] = jm_smoothing(p_term_vec, c_term_freq)
+    return  para_lmjm, para_term_freq_vecs, c_term_freq
 
-        kldiv_vecs = []
-        for i in range(3):
-            kldiv_vec = []
-            for l in range(len(lm_in_page)):
-                kldiv_vec.append(kldiv(p_term_vecs[i], lm_in_page[l]))
-            kldiv_vec = np.array(kldiv_vec)
-            kldiv_vec = kldiv_vec / np.sum(kldiv_vec)
-            kldiv_vecs.append(kldiv_vec)
-            # print(str(i+1)+": "+t[i]+": "+str(kldiv_vec.tolist()))
-        dist_p12 = kldiv(kldiv_vecs[0], kldiv_vecs[1])
-        dist_p23 = kldiv(kldiv_vecs[1], kldiv_vecs[2])
-        dist_p31 = kldiv(kldiv_vecs[2], kldiv_vecs[0])
-        if (dist_p12 < dist_p23 and dist_p12 < dist_p31):
-            acc += 1
-        # print("Similar paras: ("+t[0]+","+t[1]+"), Odd: "+t[2])
-        # print("1,2: "+str(kldiv(kldiv_vecs[0],kldiv_vecs[1]))+", 2,3: "+str(kldiv(kldiv_vecs[1],kldiv_vecs[2]))+
-        #       ", 3,1: "+str(kldiv(kldiv_vecs[2],kldiv_vecs[0])))
-    accuracy = acc * 100 / len(triples_data[()][page])
-    print(page + " Accuracy: " + accuracy + "%")
+def calc_accuracy(page):
+    if(len(triples_data[()][page])<1000):
+        print(page+" started "+str(len(triples_data[()][page]))+" triples")
+        para_lmjm, para_term_freq_vecs, c_term_freq = calc_para_lmjm(page)
+        acc = 0.0
+        for t in triples_data[()][page]:
+            top_freq_vec_page = page_freq_vec[page]
+            p_term_vecs = []
+            for p in t:
+                plabel = page_para_labels[page][p]
+                top_freq_vec_page[plabel] -= para_term_freq_vecs[p]
+                p_term_vecs.append(para_lmjm[p])
+
+            lm_in_page = []
+            for l in top_freq_vec_page.keys():
+                lm_in_page.append(jm_smoothing(top_freq_vec_page[l], c_term_freq))
+            lm_in_page = np.array(lm_in_page)
+
+            kldiv_vecs = []
+            for i in range(3):
+                kldiv_vec = []
+                for l in range(len(lm_in_page)):
+                    kldiv_vec.append(kldiv(p_term_vecs[i], lm_in_page[l]))
+                kldiv_vec = np.array(kldiv_vec)
+                kldiv_vec = kldiv_vec / np.sum(kldiv_vec)
+                kldiv_vecs.append(kldiv_vec)
+                # print(str(i+1)+": "+t[i]+": "+str(kldiv_vec.tolist()))
+            dist_p12 = kldiv(kldiv_vecs[0], kldiv_vecs[1])
+            dist_p23 = kldiv(kldiv_vecs[1], kldiv_vecs[2])
+            dist_p31 = kldiv(kldiv_vecs[2], kldiv_vecs[0])
+            if (dist_p12 < dist_p23 and dist_p12 < dist_p31):
+                acc += 1
+                correct.append(True)
+                #print("*")
+            else:
+                incorrect.append(True)
+                #print("-")
+            # print("Similar paras: ("+t[0]+","+t[1]+"), Odd: "+t[2])
+            # print("1,2: "+str(kldiv(kldiv_vecs[0],kldiv_vecs[1]))+", 2,3: "+str(kldiv(kldiv_vecs[1],kldiv_vecs[2]))+
+            #       ", 3,1: "+str(kldiv(kldiv_vecs[2],kldiv_vecs[0])))
+        accuracy = acc * 100.0 / len(triples_data[()][page])
+        print(page + " Accuracy: " + str(accuracy) + " %")
+
+def check_progress(num):
+    total = 0
+    while num != total:
+        total = len(incorrect)+len(correct)
+        print(total*100.0/num+"% triples evaluated, Mean accuracy so far: "+len(correct)*100.0/total)
+        time.sleep(30)
 
 
 # terms_file = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup.json.data/by1-train-nodup.global.terms.json"
@@ -154,14 +178,18 @@ print("Data loaded")
 
 
 
-# for page in triples_data[()].keys():
-#     calc_accuracy(page)
+for page in triples_data[()].keys():
+    calc_accuracy(page)
 
+# triples_count = 0
+# for k in triples_data[()].keys():
+#     triples_count += len(triples_data[()][k])
 
-with ProcessPoolExecutor(max_workers=num_workers) as ex:
-    for page in triples_data[()].keys():
-        ex.submit(calc_accuracy, page)
+# with ProcessPoolExecutor(max_workers=num_workers) as ex:
+#     for page in triples_data[()].keys():
+#         ex.submit(calc_accuracy, page)
 
+print("Finished")
 
 
 
