@@ -115,7 +115,7 @@ def calc_accuracy(page):
             dist_p12 = kldiv(kldiv_vecs[0], kldiv_vecs[1])
             dist_p23 = kldiv(kldiv_vecs[1], kldiv_vecs[2])
             dist_p31 = kldiv(kldiv_vecs[2], kldiv_vecs[0])
-            if (dist_p12 > dist_p23 and dist_p12 > dist_p31):
+            if (dist_p12 < dist_p23 and dist_p12 < dist_p31):
                 acc += 1
                 correct.append(True)
                 #print("*")
