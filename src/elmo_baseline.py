@@ -75,6 +75,9 @@ def main():
     page_paras_json = sys.argv[3]
     page_para_labels_json = sys.argv[4]
     elmo_out_file = sys.argv[5]
+    if len(sys.argv) > 6:
+        tf_cache_dir_path = sys.argv[6]
+        os.environ['TFHUB_CACHE_DIR'] = tf_cache_dir_path
 
     pages = []
     with open(pages_part_file, 'r') as p_part:
