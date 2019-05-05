@@ -45,13 +45,15 @@ def get_elmo_embed_paras_in_page(page, page_paras, para_text_dict, page_para_lab
         sentence_vecs = sess.run(embeddings)
     return sentence_vecs, paraids, para_sentence_count, para_sentences, para_sentences_sec_label, para_sec_label
 
-def get_embeddings(page_paras, para_text_dict, page_para_labels):
+def get_embeddings(pages, page_paras, para_text_dict, page_para_labels):
     logging.getLogger('tensorflow').disabled = True
     embed_data = dict()
     nlp = spacy.load('en_core_web_md')
     url = "https://tfhub.dev/google/elmo/2"
     embed = hub.Module(url)
     for page in page_paras.keys():
+        if page not in pages:
+            continue
         print(page)
         sentence_vecs, paraids, para_sentence_count, para_sentences, para_sentences_sec_label, para_sec_label = get_elmo_embed_paras_in_page(page, page_paras, para_text_dict, page_para_labels, nlp, embed)
         page_data = dict()
@@ -68,11 +70,16 @@ def main():
     # by1train_nodup_json = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup.json.data/by1-train-nodup.para.texts.json"
     # page_paras_json = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup.json.data/by1-train-nodup.page.paras.json"
     # page_para_labels_json = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup.json.data/by1-train-nodup.page.para.labels.json"
-    by1train_nodup_json = sys.argv[1]
-    page_paras_json = sys.argv[2]
-    page_para_labels_json = sys.argv[3]
-    elmo_out_file = sys.argv[4]
+    pages_part_file = sys.argv[1]
+    by1train_nodup_json = sys.argv[2]
+    page_paras_json = sys.argv[3]
+    page_para_labels_json = sys.argv[4]
+    elmo_out_file = sys.argv[5]
 
+    pages = []
+    with open(pages_part_file, 'r') as p_part:
+        for l in p_part:
+            pages.append(l.rstrip("\r\n"))
     with open(by1train_nodup_json, 'r') as by:
         by1train_para_text_dict = json.load(by)
     with open(page_paras_json, 'r') as pp:
@@ -80,7 +87,7 @@ def main():
     with open(page_para_labels_json, 'r') as pl:
         by1train_labels = json.load(pl)
 
-    embeddings_data = np.array(get_embeddings(by1train_page_paras, by1train_para_text_dict, by1train_labels))
+    embeddings_data = np.array(get_embeddings(pages, by1train_page_paras, by1train_para_text_dict, by1train_labels))
     # np.save("/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-elmo-data/by1train_elmo_data", embeddings_data)
     np.save(elmo_out_file, embeddings_data)
     print("Done")
