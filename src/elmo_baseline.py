@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import para_preprocessor, math, json, os, sys
+import math, json, os, sys
 import numpy as np
 from scipy.spatial import distance
 import pandas as pd
