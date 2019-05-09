@@ -24,7 +24,7 @@ def preprocess_text(paratext):
     return text
 
 def load_parapair_data(parapair_dataset_file):
-    data = np.load(parapair_dataset_file)
+    data = np.load(parapair_dataset_file, allow_pickle=True)
     train_x = []
     train_y = []
     test_x = []
