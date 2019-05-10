@@ -13,7 +13,7 @@ def preprocess_text(paratext):
     return text
 
 def get_elmo_embed_paras(paras, para_text_dict, nlp, embed):
-    print(len(paras)+" total paras")
+    print(str(len(paras))+" total paras")
     paraids = []
     para_sentences = []
     for para in paras:
@@ -24,7 +24,7 @@ def get_elmo_embed_paras(paras, para_text_dict, nlp, embed):
             if len(i) > 1:
                 para_sentences.append(i.string.strip())
                 paraids.append(para)
-    print(len(para_sentences) + " total sentences")
+    print(str(len(para_sentences)) + " total sentences")
     embed_dict = embed(para_sentences, signature="default", as_dict=True)
     wemb = embed_dict["word_emb"]
     lstm1 = embed_dict["lstm_outputs1"]
