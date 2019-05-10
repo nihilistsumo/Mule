@@ -17,7 +17,7 @@ def preprocess_text(paratext):
     text = ' '.join(text.split())
     return text
 
-def get_elmo_embed_paras_in_page(page, page_paras, para_text_dict, page_para_labels, nlp, embed):
+def get_elmo_embed_paras_in_page(page, page_paras, para_text_dict, page_para_labels, nlp, embed, mode):
     paraids = []
     para_sentence_count = []
     for p in page_paras[page]:
@@ -39,6 +39,7 @@ def get_elmo_embed_paras_in_page(page, page_paras, para_text_dict, page_para_lab
                 sent_count += 1
         para_sentence_count.append(sent_count)
     embeddings = embed(para_sentences, signature="default", as_dict=True)["default"]
+
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         sess.run(tf.tables_initializer())
