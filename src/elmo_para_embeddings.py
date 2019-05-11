@@ -52,11 +52,12 @@ def main():
     nlp = spacy.load('en_core_web_md')
     url = "https://tfhub.dev/google/elmo/2"
     embed = hub.Module(url)
+
     embed_vecs, paraids = get_elmo_embed_paras(paras, para_text_dict, nlp, embed)
     embed_data['paras'] = paraids
     embed_data['vecs'] = embed_vecs
     print("Done")
-    np.save(outfile, embed_vecs)
+    np.save(outfile, embed_data)
 
 if __name__ == '__main__':
     main()
