@@ -41,23 +41,21 @@ def get_elmo_embed_paras(paras, para_text_dict, nlp, embed):
 def main():
     para_list = sys.argv[1]
     para_text_file = sys.argv[2]
-    outfile = sys.argv[3]
+    outdir = sys.argv[3]
     with open(para_list, 'r') as pl:
         paras = json.load(pl)
     with open(para_text_file, 'r') as pt:
         para_text_dict = json.load(pt)
 
     logging.getLogger('tensorflow').disabled = True
-    embed_data = dict()
     nlp = spacy.load('en_core_web_md')
     url = "https://tfhub.dev/google/elmo/2"
     embed = hub.Module(url)
 
     embed_vecs, paraids = get_elmo_embed_paras(paras, para_text_dict, nlp, embed)
-    embed_data['paras'] = paraids
-    embed_data['vecs'] = embed_vecs
     print("Done")
-    np.save(outfile, embed_data)
+    np.save(outdir+"/embeddings_vecs", embed_vecs)
+    np.save(outdir+"/corresponding_paraids", paraids)
 
 if __name__ == '__main__':
     main()
