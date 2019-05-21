@@ -7,6 +7,12 @@ import tensorflow_hub as hub
 import spacy
 import logging
 
+#######################################
+#
+# DEPRECATED!!!!
+#
+#######################################
+
 def preprocess_text(paratext):
     text = paratext.lower().replace('\n', ' ').replace('\t', ' ').replace('\xa0', ' ')  # get rid of problem chars
     text = ' '.join(text.split())

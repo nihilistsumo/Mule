@@ -111,7 +111,8 @@ def preprocess_paras(paratext_json, stemlem):
             tokens_stemlem = tokens_nostop
         tokens_final = [i for i in tokens_stemlem if i != '']
         preprocessed_paratext[paraid] = tokens_final
-        print(str(count), end='\r')
+        if count % 100 == 0:
+            print(count)
         count += 1
     return preprocessed_paratext
 
@@ -148,8 +149,24 @@ def get_pagewise_seclm_variance(page_lm):
         # print(page + ": " + str(js_variance / len(sec_lms_in_page.keys())))
         print(page + ": " + str(kl_variance / len(sec_lms_in_page.keys())))
 
+def compress_triples_file(page_paras, triples_file):
+    triples_dat = dict()
+    with open(triples_file, 'r') as tr:
+        for l in tr:
+            page = l.split(" ")[0]
+            p1 = int(l.split(" ")[1])
+            p2 = int(l.split(" ")[2])
+            p3 = int(l.split(" ")[3])
+            if page not in triples_dat.keys():
+                triples_dat[page] = []
+                triples_dat[page].append([page_paras[page][p1], page_paras[page][p2], page_paras[page][p3]])
+            else:
+                triples_dat[page].append([page_paras[page][p1], page_paras[page][p2], page_paras[page][p3]])
+    triples_dat = np.array(triples_dat)
+    return triples_dat
+
 def main():
-    print("blah")
+    print("blah\n")
     # topsec_para = convert_para_run_to_topsec_para("/home/sumanta/Documents/Dugtrio-data/Odd-One-Out/by1train_candidate_para_runs/ghetto_sdm_paragraph.run", 100)
     # np.save("/home/sumanta/Documents/Dugtrio-data/Odd-One-Out/by1train_candidate_para_runs/ghetto_sdm_top100_paragraph_page_sec", np.array(topsec_para))
     # get_para_token_freq("/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-preprocessed-para-token-dict/by1train_cand_top100+page_paras_preproc.npy",
@@ -161,11 +178,15 @@ def main():
     #     "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-preprocessed-para-token-dict/by1train_cand_top100+page_paras_preproc_stem.npy",
     #     "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-preprocessed-para-token-dict/by1train_cand_top100+page_paras_preproc_stem_tf.npy")
 
+    preprocessed_para_tokens = preprocess_paras("/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1test-nodup.json.data/by1-test-nodup.para.texts.json", "")
+    preprocessed_para_tokens_np = np.array(preprocessed_para_tokens)
+    np.save("/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1test-nodup-preprocessed-para-token-dict/by1test_paras_preproc", preprocessed_para_tokens_np)
+
     #preprocessed_para_tokens = preprocess_paras("/home/sumanta/Documents/Dugtrio-data/Odd-One-Out/by1train_candidate_para_runs/ghetto_sdm_top100_paragraph_set.json", "")
     #preprocessed_para_tokens_np = np.array(preprocessed_para_tokens)
     #np.save("/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-preprocessed-para-token-dict/by1train_cand_top100+page_paras_preproc", preprocessed_para_tokens_np)
-    page_lms = np.load("/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-preprocessed-lm-data/by1train-nodup-stem-lmds-data.npy")
-    get_pagewise_seclm_variance(page_lms)
+    #page_lms = np.load("/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-preprocessed-lm-data/by1train-nodup-stem-lmds-data.npy")
+    #get_pagewise_seclm_variance(page_lms)
 
 if __name__ == '__main__':
     main()
