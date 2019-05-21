@@ -48,6 +48,9 @@ def main():
     para_list = sys.argv[1]
     para_text_file = sys.argv[2]
     outdir = sys.argv[3]
+    if len(sys.argv) > 4:
+        tf_cache_dir_path = sys.argv[4]
+        os.environ['TFHUB_CACHE_DIR'] = tf_cache_dir_path
     with open(para_list, 'r') as pl:
         paras = json.load(pl)
     with open(para_text_file, 'r') as pt:
