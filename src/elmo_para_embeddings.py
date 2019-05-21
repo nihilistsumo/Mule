@@ -9,7 +9,7 @@ import logging
 
 #######################################
 #
-# DEPRECATED!!!!
+# Single swipe through para list
 #
 #######################################
 

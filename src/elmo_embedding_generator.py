@@ -12,6 +12,12 @@ from spacy.lang.en import English
 from spacy import displacy
 import logging
 
+#######################################
+#
+# Page split wise calc
+#
+#######################################
+
 def preprocess_text(paratext):
     text = paratext.lower().replace('\n', ' ').replace('\t', ' ').replace('\xa0', ' ')  # get rid of problem chars
     text = ' '.join(text.split())
