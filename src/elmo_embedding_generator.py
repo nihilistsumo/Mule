@@ -23,7 +23,7 @@ def preprocess_text(paratext):
     text = ' '.join(text.split())
     return text
 
-def get_elmo_embed_paras_in_page(page, page_paras, para_text_dict, page_para_labels, nlp, embed, mode):
+def get_elmo_embed_paras_in_page(page, page_paras, para_text_dict, page_para_labels, nlp, embed):
     paraids = []
     para_sentence_count = []
     for p in page_paras[page]:
@@ -44,7 +44,11 @@ def get_elmo_embed_paras_in_page(page, page_paras, para_text_dict, page_para_lab
                 para_sentences_sec_label.append(sec_label)
                 sent_count += 1
         para_sentence_count.append(sent_count)
-    embeddings = embed(para_sentences, signature="default", as_dict=True)["default"]
+    embed_dict = embed(para_sentences, signature="default", as_dict=True)
+    wemb = embed_dict["word_emb"]
+    lstm1 = embed_dict["lstm_outputs1"]
+    lstm2 = embed_dict["lstm_outputs2"]
+    embeddings = tf.concat([wemb, lstm1, lstm2], axis=2)
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
@@ -77,6 +81,11 @@ def main():
     # by1train_nodup_json = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup.json.data/by1-train-nodup.para.texts.json"
     # page_paras_json = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup.json.data/by1-train-nodup.page.paras.json"
     # page_para_labels_json = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup.json.data/by1-train-nodup.page.para.labels.json"
+    if len(sys.argv) < 2:
+        print("Usage: python3 elmo_embedding_generator.py \n1. pages part filepath \n2. paratext json filepath"
+              "\n3. page paras json filepath \n4. page para labels filepath \n5. elmo embeddings output filepath"
+              "\n6. [tensorflow cache dir path, just give an empty dir path]")
+        sys.exit(0)
     pages_part_file = sys.argv[1]
     para_text_json = sys.argv[2]
     page_paras_json = sys.argv[3]
