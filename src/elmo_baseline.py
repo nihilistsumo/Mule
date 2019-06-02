@@ -102,10 +102,10 @@ def odd_one_out(page, triple_data, para_elmo_vecs, method):
     return performance, round((acc * 100 / count), 4)
 
 def main():
-    elmo_data_file = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-elmo-vec-data/elmo_data.npy"
-    page_paras_json = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup.json.data/by1-train-nodup.page.paras.json"
-    triples_file = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1-train-nodup.triples.npy"
-    performance_out = "/home/sumanta/Documents/Dugtrio-data/Odd-One-Out/by1train-nodup-preproc-triples-performance/by1train-nodup-tfidf.triple.performance"
+    elmo_data_file = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1test-nodup-elmo-vec-data/by1test_merged_elmo_data_squeezed.npy"
+    page_paras_json = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1test-nodup.json.data/by1-test-nodup.page.paras.json"
+    triples_file = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1-test-nodup.triples.npy"
+    #performance_out = "/home/sumanta/Documents/Dugtrio-data/Odd-One-Out/by1train-nodup-preproc-triples-performance/by1test-nodup-tfidf.triple.performance"
     triple_data = np.load(triples_file)
     triple_performance = dict()
     page_accuracy = dict()
@@ -114,7 +114,7 @@ def main():
         page_paras = json.load(pf)
         for page in page_paras.keys():
             para_elmo_vecs = get_page_para_elmo_vecs(page, elmo_data)
-            triple_performance[page], page_accuracy[page] = odd_one_out(page, triple_data, para_elmo_vecs, 'min')
+            triple_performance[page], page_accuracy[page] = odd_one_out(page, triple_data, para_elmo_vecs, '')
     # np.save(performance_out, triple_performance)
     mean_acc = 0
     for p in page_accuracy.keys():

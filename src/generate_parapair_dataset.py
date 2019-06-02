@@ -3,7 +3,7 @@
 import random, json, os, sys
 import numpy as np
 
-def generate_data(simcount, oddcount_samepage, oddcount_diffpage, page_para_labels):
+def generate_parapair_data_random_sampling(simcount, oddcount_samepage, oddcount_diffpage, page_para_labels):
     tiny_by1train_parapair_data = dict()
     count = 0
     while (count < simcount):
@@ -51,7 +51,7 @@ def main():
     output_file = "/home/sumanta/Documents/Dugtrio-data/Parapair_LSTM_data/by1train-tiny-parapair"
     with open(page_para_labels_json, 'r') as pl:
         page_para_labels = json.load(pl)
-    dataset = generate_data(500, 500, 500, page_para_labels)
+    dataset = generate_parapair_data_random_sampling(500, 500, 500, page_para_labels)
     np.save(output_file, dataset)
 
 if __name__ == '__main__':

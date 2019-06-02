@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import para_preprocessor, math, json, statistics
+import para_preprocessor, math, json, statistics, sys
 import numpy as np
 from scipy.spatial import distance
 
@@ -76,11 +76,11 @@ def odd_one_out_bm25(page, triple_data, all_terms, para_token_freq, df, avg_docl
         para_s2 = t[1]
         para_o = t[2]
 
-        sim_s1s2 = max([bm25_similarity(para_s1, para_s2, para_token_freq, df, avg_doclen, doc_lens),
+        sim_s1s2 = statistics.mean([bm25_similarity(para_s1, para_s2, para_token_freq, df, avg_doclen, doc_lens),
                         bm25_similarity(para_s2, para_s1, para_token_freq, df, avg_doclen, doc_lens)])
-        sim_s1o = max([bm25_similarity(para_s1, para_o, para_token_freq, df, avg_doclen, doc_lens),
+        sim_s1o = statistics.mean([bm25_similarity(para_s1, para_o, para_token_freq, df, avg_doclen, doc_lens),
                         bm25_similarity(para_o, para_s1, para_token_freq, df, avg_doclen, doc_lens)])
-        sim_s2o = max([bm25_similarity(para_s2, para_o, para_token_freq, df, avg_doclen, doc_lens),
+        sim_s2o = statistics.mean([bm25_similarity(para_s2, para_o, para_token_freq, df, avg_doclen, doc_lens),
                         bm25_similarity(para_o, para_s2, para_token_freq, df, avg_doclen, doc_lens)])
 
         count += 1
@@ -128,13 +128,11 @@ def odd_one_out(page, triple_data, para_tfidf):
     return performance, round((acc * 100 / count), 4)
 
 def main():
-    page_paras_json = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1test-nodup.json.data/by1-test-nodup.page.paras.json"
-    #paratext_json = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup.json.data/by1-train-nodup.para.texts.json"
-    triples_file = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1-test-nodup.triples.npy"
-    preproc_para_tokens_file = "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1test-nodup-preprocessed-para-token-dict/by1test_paras_preproc_lem.npy"
-    # preproc_para_tokens = para_preprocessor.preprocess_paras(paratext_json, stemlem)
-    # np.save("/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-preprocessed-para-token-dict/by1train_paras_preproc", preproc_para_tokens)
-    performance_out = "/home/sumanta/Documents/Dugtrio-data/Odd-One-Out/by1test-nodup-preproc-triples-performance/by1test-nodup-bm25_lemmatized.triple.performance"
+    page_paras_json_file = sys.argv[1]
+    triples_file = sys.argv[2]
+    preproc_para_tokens_file = sys.argv[3]
+    performance_out = sys.argv[4]
+    method = sys.argv[5]  # bm25/tfidf
     preproc_para_token_freq = para_preprocessor.get_para_token_freq(np.load(preproc_para_tokens_file))
     all_terms = get_terms_list(preproc_para_token_freq)
     df = get_df(all_terms, preproc_para_token_freq)
@@ -142,8 +140,8 @@ def main():
     triple_data = np.load(triples_file)
     triple_performance = dict()
     page_accuracy = dict()
-    method = "bm25" #bm25/tfidf
-    with open(page_paras_json, 'r') as pf:
+
+    with open(page_paras_json_file, 'r') as pf:
         page_paras = json.load(pf)
         if method == "bm25":
             print("bm25")
