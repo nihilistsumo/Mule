@@ -73,6 +73,7 @@ def train_model(Xtrain, ytrain, fet_list):
     y = tf.convert_to_tensor(ytrain)
     y_pred = tf.matmul(x, w)
     mse = tf.losses.mean_squared_error(y, y_pred)
+    # mse = tf.losses.sigmoid_cross_entropy(y, y_pred)
     cost = tf.reduce_mean(mse)
     adam = tf.train.AdamOptimizer(learning_rate=0.01)
     a = adam.minimize(mse, var_list=w)
