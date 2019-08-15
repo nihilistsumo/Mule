@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import json, sys, math, time, re, string
+import json, sys, math, time, re, string, argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import distance
@@ -166,7 +166,6 @@ def compress_triples_file(page_paras, triples_file):
     return triples_dat
 
 def main():
-    print("blah\n")
     # topsec_para = convert_para_run_to_topsec_para("/home/sumanta/Documents/Dugtrio-data/Odd-One-Out/by1train_candidate_para_runs/ghetto_sdm_paragraph.run", 100)
     # np.save("/home/sumanta/Documents/Dugtrio-data/Odd-One-Out/by1train_candidate_para_runs/ghetto_sdm_top100_paragraph_page_sec", np.array(topsec_para))
     # get_para_token_freq("/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-preprocessed-para-token-dict/by1train_cand_top100+page_paras_preproc.npy",
@@ -177,10 +176,17 @@ def main():
     # get_para_token_freq(
     #     "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-preprocessed-para-token-dict/by1train_cand_top100+page_paras_preproc_stem.npy",
     #     "/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1train-nodup-preprocessed-para-token-dict/by1train_cand_top100+page_paras_preproc_stem_tf.npy")
-
-    preprocessed_para_tokens = preprocess_paras("/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1test-nodup.json.data/by1-test-nodup.para.texts.json", "")
+    parser = argparse.ArgumentParser(description="Preprocess paragraph texts")
+    parser.add_argument("-p", "--para_text", required=True, help="Path to paratext file")
+    parser.add_argument("-m", "--method", required=True, help="Preprocessing method (s=stem/l=lem/no)")
+    parser.add_argument("-o", "--out", required=True, help="Path to output preprocessed file")
+    args = vars(parser.parse_args())
+    paratext_file = args["para_text"]
+    method = args["method"]
+    outfile = args["out"]
+    preprocessed_para_tokens = preprocess_paras(paratext_file, method)
     preprocessed_para_tokens_np = np.array(preprocessed_para_tokens)
-    np.save("/home/sumanta/Documents/Dugtrio-data/AttnetionWindowData/by1test-nodup-preprocessed-para-token-dict/by1test_paras_preproc", preprocessed_para_tokens_np)
+    np.save(outfile, preprocessed_para_tokens_np)
 
     #preprocessed_para_tokens = preprocess_paras("/home/sumanta/Documents/Dugtrio-data/Odd-One-Out/by1train_candidate_para_runs/ghetto_sdm_top100_paragraph_set.json", "")
     #preprocessed_para_tokens_np = np.array(preprocessed_para_tokens)

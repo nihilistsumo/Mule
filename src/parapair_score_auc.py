@@ -29,7 +29,10 @@ def calc_auc(parapair_scores, parapair_dict):
             true_parapair_dict[pairs[i]] = labels[i]
     ytrue = []
     yhat = []
-    for pp in normalized_parapair_scores.keys():
+    for pp in true_parapair_dict.keys():
+        if pp not in normalized_parapair_scores.keys():
+            print(pp+" present in parapair but not in parapair score!")
+            exit(0)
         yhat.append(normalized_parapair_scores[pp])
         ytrue.append(true_parapair_dict[pp])
     return roc_auc_score(ytrue, yhat)
