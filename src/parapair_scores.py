@@ -24,7 +24,7 @@ outfile = args["out"]
 with open(parapairs_file, 'r') as ppf:
     pp_data = json.load(ppf)
 # parapairs = pp_data['parapairs']
-preproc_para_token_freq = para_preprocessor.get_para_token_freq(np.load(preproc_para_tokens_file))
+preproc_para_token_freq = para_preprocessor.get_para_token_freq(np.load(preproc_para_tokens_file, allow_pickle=True))
 all_terms = preproc_baseline.get_terms_list(preproc_para_token_freq)
 df = preproc_baseline.get_df(all_terms, preproc_para_token_freq)
 avg_doclen, doc_lens = preproc_baseline.get_doclen_stats(preproc_para_token_freq)
