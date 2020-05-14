@@ -3,6 +3,7 @@
 import para_preprocessor, math, json, statistics, sys, argparse
 import numpy as np
 from scipy.spatial import distance
+import math
 
 def get_terms_list(all_para_tfs):
     all_terms = set()
@@ -119,6 +120,8 @@ def get_parapair_tfidf_scores(parapair_dict, para_tfidf):
             p1_vec = para_tfidf[p1]
             p2_vec = para_tfidf[p2]
             sim_score = 1 - distance.cosine(p1_vec, p2_vec)
+            if math.isnan(sim_score):
+                sim_score = 0
             scores[pp] = sim_score
             i += 1
             if i % 10000 == 0:
